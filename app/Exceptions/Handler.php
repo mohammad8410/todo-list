@@ -2,7 +2,7 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -52,6 +52,13 @@ class Handler extends ExceptionHandler
                 return response()->json([
                     'message' => 'resource not found.'
                 ], 404);
+            }
+        });
+        $this->renderable(function (AuthorizationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    "message" => "unauthorized access."
+                ], 403);
             }
         });
     }

@@ -3,49 +3,73 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\pagination\Pagination;
+use App\Http\Requests\Task\IndexTaskRequest;
+use App\Http\Requests\Task\StoreTaskRequest;
 use App\Http\Responses\TaskResponse;
 use App\Models\Task;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Response;
 
 class TaskController extends Controller
 {
-    public function index(Request $request)
+    public function index(IndexTaskRequest $request)
     {
-        $this->authorize('index', $request->user_id);
+        $canViewAllTasks = false;
+        if (Gate::allows('viewAny-task')) {
+            $canViewAllTasks = true;
+        }
+
         $user = Auth::user();
-        $userTasks = Task::query()->where('user_id', '=', $user->id);
-        if ($request->is_finished) {
-            $userTasks->where('done_at', 'NOT IS NULL', null);
+        $userId = $canViewAllTasks ? $request->get('user_id') : $user->id;
+
+        $taskQuery = Task::query();
+
+        if ($userId !== null) {
+            $taskQuery->where('user_id', '=', $user->id);
         }
-        if ($request->is_expired) {
-            $userTasks->where('expires_at', '<', now());
+
+        $isFinished = $request->get('is_finished');
+
+        if ($isFinished !== null) {
+            if ($isFinished) {
+                $taskQuery->whereNotNull('done_at');
+            } else {
+                $taskQuery->whereNull('done_at');
+            }
         }
-        $userTasks = $userTasks->paginate(15);
+
+        $isExpired = $request->get('is_expired');
+
+        if ($isExpired !== null) {
+            if ($isExpired) {
+                $taskQuery->where('expires_at', '<', now());
+            } else {
+                $taskQuery->whereNot('expires_at', '>', now());
+            }
+        }
+
+        $taskQuery = $taskQuery->paginate(15);
 
         return Response::json(Pagination::fromModelPaginatorAndData(
-            $userTasks,
-            collect($userTasks->items())->map(fn($item) => new TaskResponse($item))->toArray()
+            $taskQuery,
+            collect($taskQuery->items())->map(fn($item) => new TaskResponse($item))->toArray()
         ));
     }
 
-    public function store(Request $request)
+    public function store(StoreTaskRequest $request)
     {
         $this->authorize('create-task');
-        $validationFlag = $request->validate([
-            'description' => 'required',
-            'expires_at' => 'required',
-        ]);
-        $user = Auth::user();
-        $newTask = Task::create([
-            'user_id' => $user->id,
-            'description' => $request->input('description'),
-            'expires_at' => $request->input('expires_at'),
-        ]);
+
+        $newTask = Task::create(
+            [
+                'user_id' => Auth::user()->id,
+                'description' => $request->input('description'),
+                'expires_at' => $request->input('expires_at'),
+            ]
+        );
+
         return response(new TaskResponse($newTask), 201);
     }
 

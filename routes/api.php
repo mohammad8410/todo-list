@@ -3,7 +3,6 @@
 use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +34,7 @@ Route::group(['middleware' => ['web']], function () {
         ->middleware('auth')
         ->name('task.store');
 
-    Route::post('/tasks/{task}', [TaskController::class, 'done'])
+    Route::post('/tasks/{task}/done', [TaskController::class, 'done'])
         ->middleware('auth')
         ->name('task.done');
 

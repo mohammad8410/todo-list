@@ -4,10 +4,8 @@ namespace App\Providers;
 
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
@@ -40,10 +38,12 @@ class AuthServiceProvider extends ServiceProvider
             return true;
         });
 
+        Gate::define('viewAny-task', function (User $user) {
+            return $user->id === 1;
+        });
+
         Gate::define('index', function (User $user, $userId) {
-            return $user->id == $userId
-                ? Response::allow()
-                : Response::deny("unauthorized access.");
+            return $user->id == $userId;
         });
         //
     }
