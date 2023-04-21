@@ -91,7 +91,7 @@ class TaskController extends Controller
         }
         return response([
             "message" => "The task is expired."
-        ], 400);
+        ], 406);
     }
 
     public function update(Request $request, Task $task)
@@ -110,6 +110,6 @@ class TaskController extends Controller
         }
         return response([
             "message" => "this task is finished."
-        ], 400);
+        ], 406);
     }
 }
