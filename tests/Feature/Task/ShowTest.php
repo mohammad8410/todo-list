@@ -41,6 +41,9 @@ class ShowTest extends TestCase
         $response = $this->get(route('task.show', ['task' => $task->id]));
 
         $response->assertUnauthorized();
+        $response->assertJson([
+            "message" => "unauthenticated user.",
+        ]);
     }
 
     public function test_user_should_not_be_able_to_view_others_tasks(): void
@@ -52,6 +55,9 @@ class ShowTest extends TestCase
         $response = $this->get(route('task.show', ['task' => $task->id]));
 
         $response->assertForbidden();
+        $response->assertJson([
+            "message" => "unauthorized access.",
+        ]);
     }
 
     public function test_not_found(): void
@@ -62,5 +68,8 @@ class ShowTest extends TestCase
         $response = $this->get(route('task.show', ['task' => 10]));
 
         $response->assertNotFound();
+        $response->assertJson([
+            'message' => 'resource not found.',
+        ]);
     }
 }
