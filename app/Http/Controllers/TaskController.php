@@ -27,7 +27,7 @@ class TaskController extends Controller
         $taskQuery = Task::query();
 
         if ($userId !== null) {
-            $taskQuery->where('user_id', '=', $user->id);
+            $taskQuery->where('user_id', '=', $userId);
         }
 
         $isFinished = $request->get('is_finished');
