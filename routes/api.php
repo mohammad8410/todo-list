@@ -38,6 +38,10 @@ Route::group(['middleware' => ['web']], function () {
         ->middleware('auth')
         ->name('task.done');
 
+    Route::post('/tasks/{task}/undone', [TaskController::class, 'undone'])
+        ->middleware('auth')
+        ->name('task.undone');
+
     Route::put('/tasks/{task}', [TaskController::class, 'update'])
         ->middleware('auth')
         ->name('task.update');

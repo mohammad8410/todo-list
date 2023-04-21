@@ -94,6 +94,15 @@ class TaskController extends Controller
         ], 406);
     }
 
+    public function undone(Task $task)
+    {
+        $this->authorize('tasks', $task);
+        $task->update([
+            'done_at' => null,
+        ]);
+        return new TaskResponse($task);
+    }
+
     public function update(Request $request, Task $task)
     {
         $this->authorize('tasks', $task);
