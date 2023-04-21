@@ -65,6 +65,7 @@ class TaskController extends Controller
         $newTask = Task::create(
             [
                 'user_id' => Auth::user()->id,
+                'title' => $request->input('title'),
                 'description' => $request->input('description'),
                 'expires_at' => $request->input('expires_at'),
             ]
@@ -83,12 +84,14 @@ class TaskController extends Controller
     public function done(Task $task)
     {
         $this->authorize('tasks', $task);
+
         if (\Carbon\Carbon::now()->lte($task->expires_at)) {
             $task->update([
                 'done_at' => now()
             ]);
             return Response::json(new TaskResponse($task));
         }
+
         return response([
             "message" => "The task is expired."
         ], 406);
@@ -108,11 +111,13 @@ class TaskController extends Controller
         $this->authorize('tasks', $task);
         $validationFlag = $request->validate([
             'expires_at' => 'required',
+            'title' => 'required',
             'description' => 'required',
         ]);
         if (!$task->done_at) {
             $task->update([
                 'expires_at' => $request->input('expires_at'),
+                'title' => $request->input('title'),
                 'description' => $request->input('description'),
             ]);
             return new TaskResponse($task);

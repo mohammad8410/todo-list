@@ -7,6 +7,7 @@ use App\Models\Task;
 class TaskResponse extends \Spatie\LaravelData\Data
 {
     public int $id;
+    public string $title;
     public string $description;
     public int $user_id;
     public int $created_at;
@@ -18,6 +19,7 @@ class TaskResponse extends \Spatie\LaravelData\Data
         // public function __construct($task)
     {
         $this->id = $task->id;
+        $this->title = $task->title;
         $this->description = $task->description;
         $this->user_id = $task->user_id;
         $this->created_at = $task->created_at->timestamp;
