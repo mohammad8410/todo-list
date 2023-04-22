@@ -4,6 +4,7 @@ namespace Tests\Feature\Task;
 
 use App\Models\Task;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -42,11 +43,11 @@ class DoneTest extends TestCase
         ]);
     }
 
-    public function test_expired_tasks_can_not_mark_as_done()
+    public function test_expired_tasks_can_not_be_marked_as_done()
     {
         $user = User::factory()->create();
         $task = Task::factory()->withUser($user)->create();
-        $task->update(['expires_at' => "2020-04-25 23:19:44"]);
+        $task->update(['expires_at' => Carbon::yesterday()]);
 
         \Auth::login($user);
         $response = $this->post(route('task.done', ['task' => $task->id]));
@@ -58,8 +59,7 @@ class DoneTest extends TestCase
 
     public function test_unauthenticated_user_can_not_access_to_done_method()
     {
-        $user = User::factory()->create();
-        $task = Task::factory()->withUser($user)->create();
+        $task = Task::factory()->create();
 
         $response = $this->post(route('task.done', ['task' => $task->id]));
 
