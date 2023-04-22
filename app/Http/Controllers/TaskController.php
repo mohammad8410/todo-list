@@ -46,7 +46,7 @@ class TaskController extends Controller
             if ($isExpired) {
                 $taskQuery->where('expires_at', '<', now());
             } else {
-                $taskQuery->whereNot('expires_at', '>', now());
+                $taskQuery->whereNot('expires_at', '<', now());
             }
         }
 
