@@ -36,6 +36,10 @@ class DoneTest extends TestCase
         $response = $this->post(route('task.done', ['task' => $task->id]));
 
         $response->assertForbidden();
+
+        $response->assertJson([
+            'message' => 'unauthorized access.',
+        ]);
     }
 
     public function test_expired_tasks_can_not_mark_as_done()
@@ -50,5 +54,18 @@ class DoneTest extends TestCase
         $response->assertJson([
             'message' => 'The task is expired.',
         ]);
+    }
+
+    public function test_unauthenticated_user_can_not_access_to_done_method()
+    {
+        $user = User::factory()->create();
+        $task = Task::factory()->withUser($user)->create();
+
+        $response = $this->post(route('task.done', ['task' => $task->id]));
+
+        $response->assertJson([
+            'message' => 'unauthenticated user.',
+        ]);
+        $this->assertGuest();
     }
 }
