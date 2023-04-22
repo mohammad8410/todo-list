@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('title');
             $table->string('description');
             $table->timestamp('expires_at');
+            $table->timestamp('deleted_at')->nullable();
             $table->timestamp('done_at')->nullable();
             $table->timestamps();
         });
