@@ -103,7 +103,7 @@ class TaskController extends Controller
         $task->update([
             'done_at' => null,
         ]);
-        return new TaskResponse($task);
+        return response(new TaskResponse($task), 200);
     }
 
     public function update(Request $request, Task $task)
