@@ -78,7 +78,7 @@ class TaskController extends Controller
     {
         $this->authorize('tasks', $task);
 
-        return new TaskResponse($task);
+        return response(new TaskResponse($task), 200);
     }
 
     public function done(Task $task)
@@ -89,7 +89,7 @@ class TaskController extends Controller
             $task->update([
                 'done_at' => now()
             ]);
-            return Response::json(new TaskResponse($task));
+            return response(new TaskResponse($task), 200);
         }
 
         return response([
@@ -120,7 +120,7 @@ class TaskController extends Controller
                 'title' => $request->input('title'),
                 'description' => $request->input('description'),
             ]);
-            return new TaskResponse($task);
+            return response(new TaskResponse($task), 200);
         }
         return response([
             "message" => "this task is finished."
