@@ -12,7 +12,7 @@ class IndexTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_valid_data_structure_returned_by_index_method()
+    public function test_valid_data_structure_returned_by_index_method(): void
     {
         $user = User::factory()->create();
         $task = Task::factory()->withUser($user)->create();
@@ -57,7 +57,7 @@ class IndexTest extends TestCase
         );
     }
 
-    public function test_unauthenticated_user_should_return_401_from_index_method()
+    public function test_unauthenticated_user_should_return_401_from_index_method(): void
     {
         $user = User::factory()->create();
 
@@ -71,7 +71,7 @@ class IndexTest extends TestCase
         ]);
     }
 
-    public function test_user_wants_to_get_finished_tasks()
+    public function test_user_wants_to_get_finished_tasks(): void
     {
         $expectedCount = 2;
         $user = User::factory()->create();
@@ -88,7 +88,7 @@ class IndexTest extends TestCase
         $response->assertJsonCount($expectedCount, 'data');
     }
 
-    public function test_user_wants_to_get_unfinished_tasks()
+    public function test_user_wants_to_get_unfinished_tasks(): void
     {
         $expectedCount = 2;
         $user = User::factory()->create();
@@ -105,7 +105,7 @@ class IndexTest extends TestCase
         $response->assertJsonCount($expectedCount, 'data');
     }
 
-    public function test_user_wants_to_get_expired_tasks()
+    public function test_user_wants_to_get_expired_tasks(): void
     {
         $expectedCount = 2;
         $user = User::factory()->create();
@@ -122,7 +122,7 @@ class IndexTest extends TestCase
         $response->assertJsonCount($expectedCount, 'data');
     }
 
-    public function test_user_wants_to_get_unexpired_tasks()
+    public function test_user_wants_to_get_unexpired_tasks(): void
     {
         $expectedCount = 2;
         $user = User::factory()->create();

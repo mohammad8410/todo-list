@@ -43,7 +43,7 @@ class DoneTest extends TestCase
         ]);
     }
 
-    public function test_expired_tasks_can_not_be_marked_as_done()
+    public function test_expired_tasks_can_not_be_marked_as_done(): void
     {
         $user = User::factory()->create();
         $task = Task::factory()->withUser($user)->create();
@@ -57,7 +57,7 @@ class DoneTest extends TestCase
         ]);
     }
 
-    public function test_unauthenticated_user_can_not_access_to_done_method()
+    public function test_unauthenticated_user_can_not_access_to_done_method(): void
     {
         $task = Task::factory()->create();
 
