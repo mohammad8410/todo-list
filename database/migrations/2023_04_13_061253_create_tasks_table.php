@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->timestamp('deleted_at')->nullable();
             $table->timestamp('done_at')->nullable();
             $table->timestamps();
+            $table->boolean('notified')->default(0);
         });
     }
 
