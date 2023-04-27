@@ -46,6 +46,9 @@ Route::group(['middleware' => ['web']], function () {
         ->middleware('auth')
         ->name('task.update');
 
+    Route::delete('/tasks/{task}', [TaskController::class, 'delete'])
+        ->middleware('auth')
+        ->name('task.delete');
 
 });
 
