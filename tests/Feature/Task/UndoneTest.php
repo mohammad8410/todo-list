@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Task;
 
+use App\Events\TaskUndone;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
@@ -23,9 +24,6 @@ class UndoneTest extends TestCase
         $this->assertDatabaseHas(Task::class, [
             'done_at' => null,
         ]);
-        $this->assertDatabaseHas(User::class, [
-            'score' => -5,
-        ]);
     }
 
     public function test_unauthenticated_user_can_not_mark_a_task_as_undone()
@@ -45,5 +43,18 @@ class UndoneTest extends TestCase
         $response = $this->actingAs($user)->post(route('task.undone', ['task' => $task->id]));
 
         $response->assertForbidden();
+    }
+
+    public function test_user_score_will_decrease_when_task_is_undone()
+    {
+        $user = User::factory()->create();
+        $task1 = Task::factory()->withUser($user)->create();
+        TaskUndone::dispatch($task1);
+        $task2 = Task::factory()->withUser($user)->create();
+        TaskUndone::dispatch($task2);
+
+        $this->assertDatabaseHas(User::class, [
+            'score' => -10,
+        ]);
     }
 }

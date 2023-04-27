@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Task;
 
+use App\Events\TaskDone;
 use App\Models\Task;
 use App\Models\User;
 use Carbon\Carbon;
@@ -24,20 +25,6 @@ class DoneTest extends TestCase
         $this->assertDatabaseHas(Task::class, [
             'id' => $task1->id,
             'done_at' => now(),
-        ]);
-        $this->assertDatabaseHas(User::class, [
-            'score' => 5,
-        ]);
-
-        $response = $this->actingAs($user)->post(route('task.done', ['task' => $task2->id]));
-
-        $response->assertOk();
-        $this->assertDatabaseHas(Task::class, [
-            'id' => $task2->id,
-            'done_at' => now(),
-        ]);
-        $this->assertDatabaseHas(User::class, [
-            'score' => 10,
         ]);
     }
 
@@ -77,5 +64,18 @@ class DoneTest extends TestCase
             'message' => 'unauthenticated user.',
         ]);
         $this->assertGuest();
+    }
+
+    public function test_user_score_will_increased_when_task_is_done()
+    {
+        $user = User::factory()->create();
+        $task = Task::factory()->withUser($user)->create(['done_at' => now()]);
+        TaskDone::dispatch($task);
+        $task = Task::factory()->withUser($user)->create(['done_at' => now()]);
+        TaskDone::dispatch($task);
+
+        $this->assertDatabaseHas(User::class, [
+            'score' => 10,
+        ]);
     }
 }
