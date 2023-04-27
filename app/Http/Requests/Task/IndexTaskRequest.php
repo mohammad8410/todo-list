@@ -12,6 +12,8 @@ class IndexTaskRequest extends FormRequest
             'is_finished' => 'boolean',
             'is_expired' => 'boolean',
             'user_id' => 'int',
+            'per_page' => 'int|max:100',
+            'page' => 'int',
         ];
     }
 }

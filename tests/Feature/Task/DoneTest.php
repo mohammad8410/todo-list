@@ -17,11 +17,9 @@ class DoneTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->withUser($user)->create();
 
-        \Auth::login($user);
-        $response = $this->post(route('task.done', ['task' => $task->id]));
+        $response = $this->actingAs($user)->post(route('task.done', ['task' => $task->id]));
 
         $response->assertOk();
-
         $this->assertDatabaseHas(Task::class, [
             'id' => $task->id,
             'done_at' => now(),
@@ -33,11 +31,9 @@ class DoneTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->create();
 
-        \Auth::login($user);
-        $response = $this->post(route('task.done', ['task' => $task->id]));
+        $response = $this->actingAs($user)->post(route('task.done', ['task' => $task->id]));
 
         $response->assertForbidden();
-
         $response->assertJson([
             'message' => 'unauthorized access.',
         ]);
@@ -49,8 +45,7 @@ class DoneTest extends TestCase
         $task = Task::factory()->withUser($user)->create();
         $task->update(['expires_at' => Carbon::yesterday()]);
 
-        \Auth::login($user);
-        $response = $this->post(route('task.done', ['task' => $task->id]));
+        $response = $this->actingAs($user)->post(route('task.done', ['task' => $task->id]));
 
         $response->assertJson([
             'message' => 'The task is expired.',

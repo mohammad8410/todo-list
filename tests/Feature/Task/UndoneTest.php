@@ -17,8 +17,7 @@ class UndoneTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->withUser($user)->create(['done_at' => Carbon::now()]);
 
-        \Auth::login($user);
-        $response = $this->post(route('task.undone', ['task' => $task->id]));
+        $response = $this->actingAs($user)->post(route('task.undone', ['task' => $task->id]));
 
         $response->assertOk();
         $this->assertDatabaseHas(Task::class, [
@@ -40,8 +39,7 @@ class UndoneTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->create(['done_at' => now()]);
 
-        \Auth::login($user);
-        $response = $this->post(route('task.undone', ['task' => $task->id]));
+        $response = $this->actingAs($user)->post(route('task.undone', ['task' => $task->id]));
 
         $response->assertForbidden();
     }

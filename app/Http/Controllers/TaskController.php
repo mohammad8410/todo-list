@@ -50,7 +50,9 @@ class TaskController extends Controller
             }
         }
 
-        $taskQuery = $taskQuery->paginate(15);
+        $page = $request->get('page', 1);
+        $perPage = $request->get('per_page', 15);
+        $taskQuery = $taskQuery->paginate(perPage: $perPage, page: $page);
 
         return Response::json(Pagination::fromModelPaginatorAndData(
             $taskQuery,

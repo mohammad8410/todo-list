@@ -12,13 +12,12 @@ class IndexTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_valid_data_structure_returned_by_index_method(): void
+    public function test_valid_data_structure(): void
     {
         $user = User::factory()->create();
-        $task = Task::factory()->withUser($user)->create();
+        Task::factory()->withUser($user)->create();
 
-        \Auth::login($user);
-        $response = $this->get(route('task.index'), [
+        $response = $this->actingAs($user)->get(route('task.index'), [
             'user_id' => $user->id,
         ]);
 
@@ -57,7 +56,7 @@ class IndexTest extends TestCase
         );
     }
 
-    public function test_unauthenticated_user_should_return_401_from_index_method(): void
+    public function test_unauthenticated_user_should_return_401(): void
     {
         $user = User::factory()->create();
 
@@ -71,15 +70,14 @@ class IndexTest extends TestCase
         ]);
     }
 
-    public function test_user_wants_to_get_finished_tasks(): void
+    public function test_filter_finished_tasks(): void
     {
         $expectedCount = 2;
         $user = User::factory()->create();
         Task::factory()->withUser($user)->create();
         Task::factory($expectedCount)->withUser($user)->create(['done_at' => now()]);
 
-        \Auth::login($user);
-        $response = $this->get(route('task.index', [
+        $response = $this->actingAs($user)->get(route('task.index', [
             'user_id' => $user->id,
             'is_finished' => true,
         ]));
@@ -88,15 +86,14 @@ class IndexTest extends TestCase
         $response->assertJsonCount($expectedCount, 'data');
     }
 
-    public function test_user_wants_to_get_unfinished_tasks(): void
+    public function test_filter_unfinished_tasks(): void
     {
         $expectedCount = 2;
         $user = User::factory()->create();
         Task::factory($expectedCount)->withUser($user)->create();
         Task::factory()->withUser($user)->create(['done_at' => now()]);
 
-        \Auth::login($user);
-        $response = $this->get(route('task.index', [
+        $response = $this->actingAs($user)->get(route('task.index', [
             'user_id' => $user->id,
             'is_finished' => false,
         ]));
@@ -105,15 +102,14 @@ class IndexTest extends TestCase
         $response->assertJsonCount($expectedCount, 'data');
     }
 
-    public function test_user_wants_to_get_expired_tasks(): void
+    public function test_filter_expired_tasks(): void
     {
         $expectedCount = 2;
         $user = User::factory()->create();
         Task::factory($expectedCount)->withUser($user)->create(['expires_at' => Carbon::yesterday()]);
         Task::factory()->withUser($user)->create();
 
-        \Auth::login($user);
-        $response = $this->get(route('task.index', [
+        $response = $this->actingAs($user)->get(route('task.index', [
             'user_id' => $user->id,
             'is_expired' => true,
         ]));
@@ -122,20 +118,32 @@ class IndexTest extends TestCase
         $response->assertJsonCount($expectedCount, 'data');
     }
 
-    public function test_user_wants_to_get_unexpired_tasks(): void
+    public function test_filter_unexpired_tasks(): void
     {
         $expectedCount = 2;
         $user = User::factory()->create();
         Task::factory()->withUser($user)->create(['expires_at' => Carbon::yesterday()]);
         Task::factory($expectedCount)->withUser($user)->create();
 
-        \Auth::login($user);
-        $response = $this->get(route('task.index', [
+
+        $response = $this->actingAs($user)->get(route('task.index', [
             'user_id' => $user->id,
             'is_expired' => false,
         ]));
 
         $response->assertOk();
         $response->assertJsonCount($expectedCount, 'data');
+    }
+
+    public function test_index_pagination()
+    {
+        $per_page = 5;
+        $page = 2;
+        $user = User::factory()->create();
+        $task = Task::factory($per_page * $page + 1)->withUser($user)->create();
+
+        $response = $this->actingAs($user)->get(route('task.index', ['per_page' => $per_page, 'page' => $page]));
+
+        $response->assertJsonCount($per_page, 'data');
     }
 }

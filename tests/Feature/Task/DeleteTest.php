@@ -16,8 +16,7 @@ class DeleteTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->withUser($user)->create();
 
-        \Auth::login($user);
-        $response = $this->delete(route('task.delete', ['task' => $task]));
+        $response = $this->actingAs($user)->delete(route('task.delete', ['task' => $task]));
 
         $response->assertOk();
         $this->assertDatabaseHas(Task::class, [
@@ -40,8 +39,7 @@ class DeleteTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->create();
 
-        \Auth::login($user);
-        $response = $this->delete(route('task.delete', ['task' => $task]));
+        $response = $this->actingAs($user)->delete(route('task.delete', ['task' => $task]));
 
         $response->assertForbidden();
         $response->assertJson([
@@ -65,8 +63,7 @@ class DeleteTest extends TestCase
     {
         $user = User::factory()->create();
 
-        \Auth::login($user);
-        $response = $this->delete(route('task.delete', ['task' => 1]));
+        $response = $this->actingAs($user)->delete(route('task.delete', ['task' => 1]));
 
         $response->assertNotFound();
         $response->assertJson([

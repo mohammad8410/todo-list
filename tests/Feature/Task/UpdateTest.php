@@ -17,8 +17,7 @@ class UpdateTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->withUser($user)->create();
 
-        \Auth::login($user);
-        $response = $this->put(route('task.update', ['task' => $task->id]), [
+        $response = $this->actingAs($user)->put(route('task.update', ['task' => $task->id]), [
             'expires_at' => now(),
             'title' => 'ABCDE',
             'description' => 'dddd',
@@ -37,8 +36,7 @@ class UpdateTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->create();
 
-        \Auth::login($user);
-        $response = $this->put(route('task.update', ['task' => $task->id]), [
+        $response = $this->actingAs($user)->put(route('task.update', ['task' => $task->id]), [
             'expires_at' => now(),
             'title' => 'ABCDE',
             'description' => 'dddd',
@@ -71,8 +69,7 @@ class UpdateTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->withUser($user)->create(['done_at' => now()]);
 
-        \Auth::login($user);
-        $response = $this->put(route('task.update', ['task' => $task->id]), [
+        $response = $this->actingAs($user)->put(route('task.update', ['task' => $task->id]), [
             'expires_at' => now(),
             'title' => 'ABCDE',
             'description' => 'dddd',
@@ -88,8 +85,7 @@ class UpdateTest extends TestCase
     {
         $user = User::factory()->create();
 
-        \Auth::login($user);
-        $response = $this->put(route('task.update', ['task' => 1]), [
+        $response = $this->actingAs($user)->put(route('task.update', ['task' => 1]), [
             'expires_at' => now(),
             'title' => 'ABCDE',
             'description' => 'dddd',

@@ -16,8 +16,7 @@ class ShowTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->withUser($user)->create();
 
-        \Auth::login($user);
-        $response = $this->get(route('task.show', ['task' => $task->id]));
+        $response = $this->actingAs($user)->get(route('task.show', ['task' => $task->id]));
 
         $response->assertOk();
         $response->assertJsonStructure(
@@ -34,7 +33,29 @@ class ShowTest extends TestCase
         );
     }
 
-    public function test_with_authentication_should_return_401(): void
+    public function test_success_data(): void
+    {
+        $user = User::factory()->create();
+        $task = Task::factory()->withUser($user)->create();
+
+        $response = $this->actingAs($user)->get(route('task.show', ['task' => $task->id]));
+
+        $response->assertOk();
+        $response->assertJson(
+            [
+                'id' => $task->id,
+                'title' => $task->title,
+                'description' => $task->description,
+                'user_id' => $task->user_id,
+                'created_at' => $task->created_at->timestamp,
+                'updated_at' => $task->created_at->timestamp,
+                'expires_at' => $task->expires_at->timestamp,
+                'done_at' => null,
+            ]
+        );
+    }
+
+    public function test_without_authentication_should_return_401(): void
     {
         $task = Task::factory()->create();
 
@@ -51,8 +72,7 @@ class ShowTest extends TestCase
         $user = User::factory()->create();
         $task = Task::factory()->create();
 
-        \Auth::login($user);
-        $response = $this->get(route('task.show', ['task' => $task->id]));
+        $response = $this->actingAs($user)->get(route('task.show', ['task' => $task->id]));
 
         $response->assertForbidden();
         $response->assertJson([
@@ -64,8 +84,7 @@ class ShowTest extends TestCase
     {
         $user = User::factory()->create();
 
-        \Auth::login($user);
-        $response = $this->get(route('task.show', ['task' => 10]));
+        $response = $this->actingAs($user)->get(route('task.show', ['task' => 10]));
 
         $response->assertNotFound();
         $response->assertJson([
