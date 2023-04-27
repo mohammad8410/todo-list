@@ -126,4 +126,13 @@ class TaskController extends Controller
             "message" => "this task is finished."
         ], 406);
     }
+
+    public function delete(Task $task)
+    {
+        $this->authorize('tasks', $task);
+
+        $task->delete();
+
+        return response(new TaskResponse($task), 200);
+    }
 }
