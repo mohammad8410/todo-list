@@ -23,6 +23,9 @@ class UndoneTest extends TestCase
         $this->assertDatabaseHas(Task::class, [
             'done_at' => null,
         ]);
+        $this->assertDatabaseHas(User::class, [
+            'score' => -5,
+        ]);
     }
 
     public function test_unauthenticated_user_can_not_mark_a_task_as_undone()

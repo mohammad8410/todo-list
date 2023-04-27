@@ -15,14 +15,29 @@ class DoneTest extends TestCase
     public function test_authenticated_user_should_be_able_to_mark_his_task_as_done(): void
     {
         $user = User::factory()->create();
-        $task = Task::factory()->withUser($user)->create();
+        $task1 = Task::factory()->withUser($user)->create();
+        $task2 = Task::factory()->withUser($user)->create();
 
-        $response = $this->actingAs($user)->post(route('task.done', ['task' => $task->id]));
+        $response = $this->actingAs($user)->post(route('task.done', ['task' => $task1->id]));
 
         $response->assertOk();
         $this->assertDatabaseHas(Task::class, [
-            'id' => $task->id,
+            'id' => $task1->id,
             'done_at' => now(),
+        ]);
+        $this->assertDatabaseHas(User::class, [
+            'score' => 5,
+        ]);
+
+        $response = $this->actingAs($user)->post(route('task.done', ['task' => $task2->id]));
+
+        $response->assertOk();
+        $this->assertDatabaseHas(Task::class, [
+            'id' => $task2->id,
+            'done_at' => now(),
+        ]);
+        $this->assertDatabaseHas(User::class, [
+            'score' => 10,
         ]);
     }
 

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\TaskDone;
+use App\Events\TaskUndone;
 use App\Http\Controllers\pagination\Pagination;
 use App\Http\Requests\Task\IndexTaskRequest;
 use App\Http\Requests\Task\StoreTaskRequest;
@@ -91,6 +93,7 @@ class TaskController extends Controller
             $task->update([
                 'done_at' => now()
             ]);
+            event(new TaskDone($task));
             return response(new TaskResponse($task), 200);
         }
 
@@ -105,6 +108,7 @@ class TaskController extends Controller
         $task->update([
             'done_at' => null,
         ]);
+        event(new TaskUndone($task));
         return response(new TaskResponse($task), 200);
     }
 
